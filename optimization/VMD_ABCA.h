@@ -30,25 +30,30 @@ private:
 	/* 有关排列熵的参数 */
 	struct PEpara
 	{
-		double* Series;			// 待求解序列
+		double* IMF;			// 待求解序列
 		int len;					// 序列总长度
 		rentype::byte M;		// 嵌入维度
 		int T;						// 采样间隔
 
-		PEpara(double* S, int l)
+		PEpara(int prolen)
 		{
-			Series = S;
-			len = l;
+			IMF = new double[prolen];
+			len = prolen;
 			M = 5;
 			T = 0;
 		}
-		PEpara(double* S, int l, rentype::byte m, int t)
+		PEpara(int prolen, rentype::byte m, int t)
 		{
-			Series = S;
-			len = l;
+			IMF = new double[prolen];
+			len = prolen;
 			M = m;
 			T = t;
 		}
+		virtual ~PEpara();
+		PEpara(PEpara&) = delete;
+		PEpara& operator=(PEpara&) = delete;
+		PEpara(PEpara&&) = delete;
+		PEpara&& operator=(PEpara&&) = delete;
 	};
 protected:
 	/* 可行解，蜜源 */
@@ -93,15 +98,13 @@ protected:
 	/* 有关适应度函数的参数 */
 	struct Fpara :public PEpara
 	{
-		double* IMF;
 		double entropy[FSpara::Kmax];
 		mxArray* mX;
 		mxArray* mK;
 		mxArray* mAlpha;
 
-		Fpara(double* problem, int prolen) :PEpara(problem, prolen)
+		Fpara(double* problem, int prolen) :PEpara(prolen)
 		{
-			IMF = new double[prolen];
 			mwSize columnsize = 1;
 			mX = mxCreateDoubleMatrix(1, prolen, mxREAL);
 			mK = mxCreateNumericArray(1, &columnsize, mxINT32_CLASS, mxREAL);

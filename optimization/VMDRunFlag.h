@@ -3,7 +3,7 @@
 
 namespace VMDRunFlag
 {
-	bool flag = false;				// matlab启动标志
+	bool Flag = false;				// matlab启动标志
 	bool VMDInit();
 	bool VMDTerminate();
 }
@@ -14,7 +14,7 @@ inline bool VMDRunFlag::VMDInit()
 		return false;
 	if (!mvmdInitialize())
 		return false;
-	flag = true;
+	Flag = true;
 	return true;
 }
 
@@ -22,6 +22,6 @@ inline bool VMDRunFlag::VMDTerminate()
 {
 	mvmdTerminate();
 	mclTerminateApplication();
-	flag = false;
+	Flag = false;
 	return true;
 }

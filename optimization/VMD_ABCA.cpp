@@ -22,6 +22,11 @@ namespace Random
 namespace rd = Random;
 
 
+VMD_ABCA::PEpara::~PEpara()
+{
+	delete[] IMF;
+}
+
 VMD_ABCA::FeasibleSolution&& VMD_ABCA::FeasibleSolution::operator*(double)
 {
 	return FeasibleSolution(K * rd::randr(rd::gen), Alpha * rd::randr(rd::gen));
@@ -74,7 +79,6 @@ VMD_ABCA::Fpara::~Fpara()
 	mxDestroyArray(mAlpha);
 	mxDestroyArray(mK);
 	mxDestroyArray(mX);
-	delete[] IMF;
 }
 
 inline void VMD_ABCA::Fpara::TransformNecter(const Nectar* n)
@@ -117,7 +121,7 @@ double VMD_ABCA::PE(const PEpara* para)
 		loca = 0;
 		for (j = i, k = 0; k < para->M; j += t, k++)
 		{
-			crest[k] = para->Series[j];
+			crest[k] = para->IMF[j];
 			cindex[k] = rloca[k] = k;
 		}
 		/* 冒泡排序 */
@@ -193,7 +197,14 @@ inline bool VMD_ABCA::UpdateGlobal(Bee& comp1, Bee& comp2)
 
 inline int VMD_ABCA::Recruit(double* arr)
 {
-	double fitnessSum = sum<double, sizeof(VMD_ABCA)>(&looker[0].fitness, Npara::looker);
+	/*
+	* 在引领蜂数量为 40 时，此函数在循环第 21 次之后，地址所对应的值不对
+	* 猜测是因为内存不连续，但编译器知道怎么使它们看起来是连续的
+	* double fitnessSum = sum<double, sizeof(VMD_ABCA)>(&looker[0].fitness, Npara::looker);
+	*/
+	double fitnessSum = 0.;
+	for (int i = 0; i < Npara::looker; i++)
+		fitnessSum += looker[i].fitness;
 	arr[0] = looker[0].fitness / fitnessSum;
 	for (int i = 1; i < Npara::looker; i++)
 	{
@@ -201,7 +212,7 @@ inline int VMD_ABCA::Recruit(double* arr)
 		arr[i] += arr[i - 1];
 	}
 	double rand = rd::randroulette(rd::gen);
-	return GetAddressOfArray<double>(arr, std::find_if(arr, arr + Npara::looker, [&rand](int x)->bool {return x >= rand; }));
+	return GetAddressOfArray<double>(arr, std::find_if(arr, arr + Npara::looker, [rand](double x)->bool {return x >= rand; }));
 }
 
 inline void VMD_ABCA::Search(Fpara& para, int rr)
@@ -270,5 +281,5 @@ void VMD_ABCA::Solution(const double* problem, const int prolen)
 
 inline void VMD_ABCA::PrintOpt(int iteration)const
 {
-	printf("%d: [%2d %4d] %.7f", iteration, optimal.choice.K, optimal.choice.Alpha, optimal.fitness);
+	printf("%02d:    %.7f\t[%2d %4d]\t%ld\n", iteration, optimal.fitness, optimal.choice.K, optimal.choice.Alpha, clock() / CLOCKS_PER_SEC);
 }
