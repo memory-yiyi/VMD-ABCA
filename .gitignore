@@ -33,4 +33,5 @@
 
 # Others
 .vs/
+x64/
 *test*

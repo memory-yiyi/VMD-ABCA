@@ -14,4 +14,37 @@
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="mvmd.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="mathexpand.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="VMD_ABCA.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="rentype.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="VMDRunFlag.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="oldtest.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="VMD_ABCA.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="OPTVMD.cd">
+      <Filter>资源文件</Filter>
+    </None>
+  </ItemGroup>
 </Project>

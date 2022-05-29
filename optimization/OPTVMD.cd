@@ -1,0 +1,47 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="VMD_ABCA">
+    <Position X="4" Y="1.75" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Methods" Collapsed="true" />
+      <Compartment Name="Fields" Collapsed="true" />
+    </Compartments>
+    <NestedTypes>
+      <Struct Name="VMD_ABCA::PEpara" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>VMD_ABCA.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Struct>
+      <Typedef Name="VMD_ABCA::Nectar" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>VMD_ABCA.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Typedef>
+      <Struct Name="VMD_ABCA::FeasibleSolution" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>VMD_ABCA.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Struct>
+      <Typedef Name="VMD_ABCA::Bee" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>VMD_ABCA.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Typedef>
+      <Struct Name="VMD_ABCA::Swarm" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>VMD_ABCA.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Struct>
+      <Struct Name="VMD_ABCA::Fpara" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>VMD_ABCA.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Struct>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>AAAhABAAAAAAICBAAAAAAAAAAARAAAAAAAAAAwAgAAA=</HashCode>
+      <FileName>VMD_ABCA.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Microsoft YaHei UI" Size="9" />
+</ClassDiagram>
