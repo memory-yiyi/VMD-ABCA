@@ -21,6 +21,16 @@ namespace Random
 }
 namespace rd = Random;
 
+/* 有关优化的参数 */
+namespace Opara
+{
+	bool GlobalFlag = false;
+	bool LocalFlag = false;
+	const short limit = 6;			// 连续无优化迭代的最大次数
+	short dynlimit = limit;			// 连续无优化迭代的最大次数(动态)
+	short time = 0;					// 当前无优化迭代的次数
+}
+
 
 VMD_ABCA::PEpara::~PEpara()
 {
@@ -184,15 +194,13 @@ inline double VMD_ABCA::Fitness(Fpara& para, const int K)
 	return var<double>(para.entropy, K) / mean<double>(para.entropy, K);
 }
 
-inline bool VMD_ABCA::UpdateGlobal(Bee& comp1, Bee& comp2)
+inline void VMD_ABCA::UpdateGlobal(Bee& comp1, Bee& comp2)
 {
 	if (comp1 > comp2 || (comp1 == comp2 && comp1.choice.K > comp2.choice.K))
 	{
 		comp2 = comp1;
-		return true;
+		Opara::GlobalFlag = true;
 	}
-	else
-		return false;
 }
 
 inline int VMD_ABCA::Recruit(double* arr)
@@ -202,7 +210,10 @@ inline int VMD_ABCA::Recruit(double* arr)
 	* 猜测是因为内存不连续，但编译器知道怎么使它们看起来是连续的
 	* double fitnessSum = sum<double, sizeof(VMD_ABCA)>(&looker[0].fitness, Npara::looker);
 	*/
-	double fitnessSum = 0.;
+	if (!Opara::LocalFlag)
+		goto next;
+	static double fitnessSum;
+	fitnessSum = 0.;
 	for (int i = 0; i < Npara::looker; i++)
 		fitnessSum += looker[i].fitness;
 	arr[0] = looker[0].fitness / fitnessSum;
@@ -211,6 +222,7 @@ inline int VMD_ABCA::Recruit(double* arr)
 		arr[i] = looker[i].fitness / fitnessSum;
 		arr[i] += arr[i - 1];
 	}
+	next:
 	double rand = rd::randroulette(rd::gen);
 	return GetAddressOfArray<double>(arr, std::find_if(arr, arr + Npara::looker, [rand](double x)->bool {return x >= rand; }));
 }
@@ -230,18 +242,18 @@ inline void VMD_ABCA::Search(Fpara& para, int rr)
 	UpdateLocal(follow, looker[rr]);
 }
 
-inline bool VMD_ABCA::UpdateLocal(Bee& comp1, Bee& comp2)
+inline void VMD_ABCA::UpdateLocal(Bee& comp1, Bee& comp2)
 {
 	if (comp1 > comp2 || (comp1 == comp2 && comp1.choice.K > comp2.choice.K))
 	{
 		comp2 = comp1;
 		UpdateGlobal(comp2, optimal);
-		return true;
+		Opara::LocalFlag = true;
 	}
 	else
 	{
 		comp2.count++;
-		return false;
+		Opara::LocalFlag = false;
 	}
 }
 
@@ -265,10 +277,13 @@ void VMD_ABCA::Solution(const double* problem, const int prolen)
 	/* 初始化蜜源 */
 	for (i = 0; i < Npara::num; i++)
 		InitNectar(looker[i], Fpa);
+	Opara::GlobalFlag = false;
+	Opara::LocalFlag = true;
 
 	/* 种群迭代 */
 	for (i = 0; i < Npara::maxit; i++)
 	{
+		Opara::GlobalFlag = false;
 		for (j = 0; j < Npara::follow; j++)
 		{
 			resultroulette = Recruit(roulette);
@@ -276,6 +291,13 @@ void VMD_ABCA::Solution(const double* problem, const int prolen)
 			Abandon(looker[resultroulette], Fpa);
 		} // for (j = 0; j < Npara::follow; j++)
 		PrintOpt(i);
+		if (!(i % Opara::limit) && i && Opara::dynlimit > 3)
+			Opara::dynlimit--;
+		if (Opara::GlobalFlag)
+			Opara::time = 0;
+		else
+			if (++Opara::time >= Opara::dynlimit)
+				break;
 	} // for (i = 0; i < Npara::maxit; i++)
 }
 

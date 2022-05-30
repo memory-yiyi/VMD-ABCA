@@ -137,13 +137,13 @@ protected:
 	/* 适应度函数 */
 	double Fitness(Fpara& para, const int K);
 	/* 更新全局最优解 */
-	bool UpdateGlobal(Bee& comp1, Bee& comp2);
+	void UpdateGlobal(Bee& comp1, Bee& comp2);
 	/* 招募跟随蜂算子 */
 	int Recruit(double* arr);
 	/* 跟随蜂搜索蜜源算子 */
 	void Search(Fpara& para, int rr);
 	/* 更新局部最优解 */
-	bool UpdateLocal(Bee& comp1, Bee& comp2);
+	void UpdateLocal(Bee& comp1, Bee& comp2);
 	/* 放弃蜜源算子 */
 	void Abandon(Bee& b, Fpara& para);
 public:
