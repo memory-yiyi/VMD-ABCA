@@ -1,43 +1,43 @@
+#define _CRT_SECURE_NO_WARNINGS 
 #include"VMD_ABCA.h"
 #include"VMDRunFlag.h"
 #include<iostream>
 using std::cout;
 using std::endl;
-std::random_device rd;
-std::mt19937 gen(rd());
-std::normal_distribution<> randn(0, 1);
 
-const double pi = acos(-1);
-struct Signal
+
+int main(int argc, char* argv[])
 {
-	double* Series;
+	FILE* fp;
+	double* data;
 	int len;
-	static const double pi;
-
-	Signal(double ts,double te,int fs)
+	char clen[_MAX_ITOSTR_BASE10_COUNT + 1] = { 0 }, * str;
+	str = strrchr(argv[1], '\\');
+	strncpy(clen, str + 1, _MAX_ITOSTR_BASE10_COUNT);
+	if ((str = strchr(clen, '(')) != NULL)
+		*str = 0;
+	else
 	{
-		len = (te - ts) * fs;
-		Series = new double[len];
-		for (int i = 0; i < len; i++)
-		{
-			Series[i] = ts + i / (double)fs;
-			Series[i] = 1.6 * cos(2 * pi * 5 * Series[i]) + 1.2 * cos(2 * pi * 50 * Series[i]) + 1.4 * cos(2 * pi * 200 * Series[i]) + 0.01 * randn(gen);
-		}
+		str = strchr(clen, '.');
+		*str = 0;
 	}
-	virtual ~Signal();
-};
-const double Signal::pi = acos(-1);
-Signal::~Signal()
-{
-	delete[] Series;
-}
+	len = atoi(clen);
+	data = new double[len];
+	if ((fp = fopen(argv[1], "rb")) == NULL)
+	{
+		cout << "Cann't open file: " << argv[1] << endl;
+		getchar();
+		return 1;
+	}
+	fread((void*)data, sizeof(double), len, fp);
+	fclose(fp);
 
-
-int main()
-{
-	Signal S(0, 1, 1000);
 	VMD_ABCA Ans;
 	VMDRunFlag::VMDInit();
-	Ans.ThreeToBest(S.Series, S.len);
+	Ans.ThreeToBest(data, len);
 	VMDRunFlag::VMDTerminate();
+
+	delete[] data;
+	getchar();
+	return 0;
 }
