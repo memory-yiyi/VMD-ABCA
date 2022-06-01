@@ -35,9 +35,6 @@
     <ClCompile Include="main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="oldtest.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="VMD_ABCA.cpp">
       <Filter>源文件</Filter>
     </ClCompile>

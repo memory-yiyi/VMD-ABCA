@@ -3,6 +3,10 @@
 #include"mvmd.h"
 #include<random>
 
+#ifndef ShowDetailOfIteration
+#define ShowDetailOfIteration 1
+#endif // !ShowDetailOfIteration
+
 /* 有关可行解边界的参数 */
 namespace FSpara
 {
@@ -14,11 +18,12 @@ namespace FSpara
 /* 有关ASI的参数 */
 namespace Spara
 {
-	const short num = 40;				// 蜜源的个数
-	const short looker = num;			// 引领蜂的个数
-	const short follow = 240;				// 跟随蜂的个数
-	const short maxit = 60;				// 最大迭代次数
-	const short limit = 40;				// 最大开采次数
+	const short num = 5;															// 蜜源的个数，局部最优解的数量，也意味着空间消耗的多少
+	const short looker = num;													// 引领蜂的个数
+	const short follow = 32;														// 跟随蜂的个数，意味着更新全局最优解速度的快慢
+	const short maxit = (FSpara::Kmax - FSpara::Kmin) *
+		(FSpara::Alphamax - FSpara::Alphamin) / follow;				// 最大迭代次数
+	const short limit = 16;															// 最大开采次数
 };
 /* 控制蜜源的相关参数 */
 namespace Npara = Spara;
@@ -93,7 +98,7 @@ protected:
 		virtual ~Swarm() = default;
 		Swarm(Swarm&) = delete;
 		Swarm(Swarm&&) = delete;
-		Swarm&& operator=(Swarm&&) = delete;
+		Swarm& operator=(Swarm&&) = default;
 	} Bee;
 	/* 有关适应度函数的参数 */
 	struct Fpara :public PEpara
@@ -146,12 +151,13 @@ protected:
 	void UpdateLocal(Bee& comp1, Bee& comp2);
 	/* 放弃蜜源算子 */
 	void Abandon(Bee& b, Fpara& para);
+	/* 打印当前全局最优解 */
+	void PrintAnsOfThisIter(int iteration)const;
+	/* 打印计算结果 */
+	void PrintAns(Bee& b);
 public:
 	/* 核心算法 */
 	void Solution(const double* problem, const int prolen);
-	/* 打印当前全局最优解 */
-	void PrintOpt(int iteration)const;
-
-	/* 特殊成员函数 */
+	/* 三次取优 */
+	void ThreeToBest(const double* problem, const int prolen);
 };
-

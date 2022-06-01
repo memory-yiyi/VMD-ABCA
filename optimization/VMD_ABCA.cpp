@@ -26,9 +26,9 @@ namespace Opara
 {
 	bool GlobalFlag = false;
 	bool LocalFlag = false;
-	const short limit = 6;			// 连续无优化迭代的最大次数
-	short dynlimit = limit;			// 连续无优化迭代的最大次数(动态)
-	short time = 0;					// 当前无优化迭代的次数
+	const short limit = Npara::maxit / 100;			// 连续无优化迭代的最大次数
+	short dynlimit = limit;									// 连续无优化迭代的最大次数(动态)
+	short time = 0;											// 当前无优化迭代的次数
 }
 
 
@@ -267,6 +267,18 @@ inline void VMD_ABCA::Abandon(Bee& b, Fpara& para)
 	}
 }
 
+inline void VMD_ABCA::PrintAnsOfThisIter(int iteration)const
+{
+	printf("%02d:    %.7f\t[%2d %4d]\t%ld\n", iteration, optimal.fitness, optimal.choice.K, optimal.choice.Alpha, clock() / CLOCKS_PER_SEC);
+}
+
+inline void VMD_ABCA::PrintAns(Bee& b)
+{
+	cout << "K = " << b.choice.K << endl;
+	cout << "Alpha = " << b.choice.Alpha << endl;
+	cout << "fitness = " << b.fitness << endl;
+}
+
 void VMD_ABCA::Solution(const double* problem, const int prolen)
 {
 	int i, j, k;											// 循环变量
@@ -281,6 +293,9 @@ void VMD_ABCA::Solution(const double* problem, const int prolen)
 	Opara::LocalFlag = true;
 
 	/* 种群迭代 */
+#if ShowDetailOfIteration
+	cout << "details:" << endl;
+#endif // ShowDetailOfIteration
 	for (i = 0; i < Npara::maxit; i++)
 	{
 		Opara::GlobalFlag = false;
@@ -290,8 +305,10 @@ void VMD_ABCA::Solution(const double* problem, const int prolen)
 			Search(Fpa, resultroulette);
 			Abandon(looker[resultroulette], Fpa);
 		} // for (j = 0; j < Npara::follow; j++)
-		PrintOpt(i);
-		if (!(i % Opara::limit) && i && Opara::dynlimit > 3)
+#if ShowDetailOfIteration
+		PrintAnsOfThisIter(i);
+#endif // ShowDetailOfIteration
+		if (!(i % (Npara::maxit / 10)) && i && Opara::dynlimit > 2)
 			Opara::dynlimit--;
 		if (Opara::GlobalFlag)
 			Opara::time = 0;
@@ -299,9 +316,26 @@ void VMD_ABCA::Solution(const double* problem, const int prolen)
 			if (++Opara::time >= Opara::dynlimit)
 				break;
 	} // for (i = 0; i < Npara::maxit; i++)
+	cout << "the answer is:" << endl;
+	PrintAns(optimal);
 }
 
-inline void VMD_ABCA::PrintOpt(int iteration)const
+void VMD_ABCA::ThreeToBest(const double* problem, const int prolen)
 {
-	printf("%02d:    %.7f\t[%2d %4d]\t%ld\n", iteration, optimal.fitness, optimal.choice.K, optimal.choice.Alpha, clock() / CLOCKS_PER_SEC);
+	Bee best;
+	for (rt::byte i = 0; i < 3; i++)
+	{
+		/* 运行计算 */
+		Solution(problem, prolen);
+		UpdateGlobal(optimal, best);
+		/* 初始化变量 */
+		Opara::dynlimit = Opara::limit;
+		Opara::time = 0;
+		for (rt::byte j = 0; j < Npara::looker; j++)
+			looker[j] = Bee();
+		follow = Bee();
+		optimal = Bee();
+	}
+	cout << "the best is:" << endl;
+	PrintAns(best);
 }

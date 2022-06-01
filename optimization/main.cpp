@@ -35,9 +35,9 @@ Signal::~Signal()
 
 int main()
 {
-	Signal S(0, 1, 500);
+	Signal S(0, 1, 1000);
 	VMD_ABCA Ans;
 	VMDRunFlag::VMDInit();
-	Ans.Solution(S.Series, S.len);
+	Ans.ThreeToBest(S.Series, S.len);
 	VMDRunFlag::VMDTerminate();
 }
